@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import axios from 'axios'
+import BernoulliDistribution  from './components/BernoulliDistribution'
 
 function App() {
 
@@ -14,7 +15,7 @@ function App() {
   }, [])
 
   return (
-    <h1>Distribuciones de Probabilidad</h1>
+    <BernoulliDistribution />
   )
 }
 
