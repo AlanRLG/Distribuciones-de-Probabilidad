@@ -1,22 +1,39 @@
-import { useEffect } from 'react'
-import axios from 'axios'
-import BernoulliDistribution  from './components/BernoulliDistribution'
+import { useState } from 'react';
+import BernoulliDistribution from './components/BernoulliDistribution';
+import BinomialDistribution from './components/BinomialDistribution';
+import type { DistributionId } from './types/distributions';
+import PoissonDistribution from './components/PoissonDistribution';
 
 function App() {
+  const [distribution, setDistribution] = useState<DistributionId>('bernoulli');
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8000/')
-      .then(response => {
-        console.log(response.data)
-      })
-      .catch(error => {
-        console.error(error)
-      })
-  }, [])
+  const handleDistributionChange = (id: DistributionId) => {
+    setDistribution(id);
+  };
+
+  if (distribution === 'binomial') {
+    return (
+      <BinomialDistribution
+        activeDistribution={distribution}
+        onDistributionChange={handleDistributionChange}
+      />
+    );
+  }
+  if (distribution === 'poisson'){
+    return(
+      <PoissonDistribution
+      activeDistribution={distribution}
+      onDistributionChange={handleDistributionChange}
+      />
+    );
+  }
 
   return (
-    <BernoulliDistribution />
-  )
+    <BernoulliDistribution
+      activeDistribution={distribution}
+      onDistributionChange={handleDistributionChange}
+    />
+  );
 }
 
-export default App
+export default App;

@@ -24,21 +24,42 @@ interface SimulationResults {
   pmf: Array<{ k: number; simulated: number; theoretical: number }>;
 }
 
-function simulateBernoulli(p: number, sampleSize: number): SimulationResults {
+function binomialCoeff(n: number, k: number): number {
+  if (k < 0 || k > n) return 0;
+  let result = 1;
+  for (let i = 0; i < k; i++) {
+    result = (result * (n - i)) / (i + 1);
+  }
+  return result;
+}
+
+function theoreticalBinomialPmf(n: number, p: number, k: number): number {
+  return binomialCoeff(n, k) * p ** k * (1 - p) ** (n - k);
+}
+
+function simulateBinomial(n: number, p: number, sampleSize: number): SimulationResults {
   const clampedP = Math.min(1, Math.max(0, p));
-  const samples: number[] = Array.from({ length: sampleSize }, () =>
-    Math.random() < clampedP ? 1 : 0,
-  );
+  const clampedN = Math.max(1, Math.min(50, Math.floor(n)));
+  const nSamples = Math.max(1, sampleSize);
 
-  const count1 = samples.reduce((acc, value) => acc + value, 0);
-  const count0 = sampleSize - count1;
+  const counts = new Array<number>(clampedN + 1).fill(0);
+  const trialValues: number[] = [];
 
-  const empiricalMean = count1 / sampleSize;
+  for (let i = 0; i < nSamples; i++) {
+    let successes = 0;
+    for (let j = 0; j < clampedN; j++) {
+      if (Math.random() < clampedP) successes++;
+    }
+    counts[successes]++;
+    trialValues.push(successes);
+  }
+
+  const empiricalMean = trialValues.reduce((acc, v) => acc + v, 0) / nSamples;
   const empiricalVariance =
-    samples.reduce((acc, value) => acc + (value - empiricalMean) ** 2, 0) / sampleSize;
+    trialValues.reduce((acc, v) => acc + (v - empiricalMean) ** 2, 0) / nSamples;
 
-  const theoreticalMean = clampedP;
-  const theoreticalVariance = clampedP * (1 - clampedP);
+  const theoreticalMean = clampedN * clampedP;
+  const theoreticalVariance = clampedN * clampedP * (1 - clampedP);
 
   return {
     empirical_mean: empiricalMean,
@@ -47,26 +68,28 @@ function simulateBernoulli(p: number, sampleSize: number): SimulationResults {
     theoretical_variance: theoreticalVariance,
     empirical_std: Math.sqrt(empiricalVariance),
     theoretical_std: Math.sqrt(theoreticalVariance),
-    pmf: [
-      { k: 0, simulated: count0 / sampleSize, theoretical: 1 - clampedP },
-      { k: 1, simulated: count1 / sampleSize, theoretical: clampedP },
-    ],
+    pmf: Array.from({ length: clampedN + 1 }, (_, k) => ({
+      k,
+      simulated: counts[k] / nSamples,
+      theoretical: theoreticalBinomialPmf(clampedN, clampedP, k),
+    })),
   };
 }
 
-const initialResults = simulateBernoulli(0.5, 1000);
+const initialResults = simulateBinomial(10, 0.5, 1000);
 
-export default function BernoulliDistribution({
+export default function BinomialDistribution({
   activeDistribution,
   onDistributionChange,
 }: DistributionPageProps) {
   const [p, setP] = useState(0.5);
+  const [n, setN] = useState(10);
   const [sampleSize, setSampleSize] = useState(1000);
   const [results, setResults] = useState<SimulationResults>(initialResults);
   const chartRef = useRef<HTMLDivElement>(null);
 
   const handleSimulate = () => {
-    setResults(simulateBernoulli(p, Math.max(1, sampleSize)));
+    setResults(simulateBinomial(n, p, Math.max(1, sampleSize)));
   };
 
   const relativeError =
@@ -101,7 +124,7 @@ export default function BernoulliDistribution({
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `bernoulli_p${p}_N${sampleSize}.csv`;
+    a.download = `binomial_p${p}_N${sampleSize}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -115,7 +138,7 @@ export default function BernoulliDistribution({
       });
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
-      link.download = `bernoulli_p${p}_N${sampleSize}.png`;
+      link.download = `binomial_p${p}_N${sampleSize}.png`;
       link.click();
     } catch (error) {
       console.error('Error al exportar PNG:', error);
@@ -159,7 +182,7 @@ export default function BernoulliDistribution({
           <section className={styles.chartZone}>
             <div className={styles.chartZoneHeader}>
               <div className={styles.chartTitle}>
-                <h2>Bernoulli(p={p.toFixed(2)})</h2>
+                <h2>Binomial(n={n}, p={p.toFixed(2)})</h2>
                 <p className={styles.chartSubtitle}>
                   Frecuencia relativa simulada vs PMF teórica · N ={' '}
                   {sampleSize.toLocaleString('es-MX')}
@@ -232,11 +255,11 @@ export default function BernoulliDistribution({
           <section className={styles.controlsZone}>
             <div className={styles.controlsRow}>
               <div className={styles.field}>
-                <label className={styles.fieldLabel} htmlFor="bernoulli-p">
+                <label className={styles.fieldLabel} htmlFor="binomial-p">
                   Probabilidad de éxito (p)
                 </label>
                 <input
-                  id="bernoulli-p"
+                  id="binomial-p"
                   type="number"
                   min="0"
                   max="1"
@@ -248,11 +271,27 @@ export default function BernoulliDistribution({
               </div>
 
               <div className={styles.field}>
-                <label className={styles.fieldLabel} htmlFor="bernoulli-n">
+                <label className={styles.fieldLabel} htmlFor="binomial-n">
+                  Número de ensayos (n)
+                </label>
+                <input
+                  id="binomial-n"
+                  type="number"
+                  min="1"
+                  max="50"
+                  step="1"
+                  value={n}
+                  onChange={(e) => setN(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                  className={styles.parameterInput}
+                />
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor="binomial-N">
                   Tamaño de muestra (N)
                 </label>
                 <input
-                  id="bernoulli-n"
+                  id="binomial-N"
                   type="number"
                   min="1"
                   step="1"
@@ -267,7 +306,8 @@ export default function BernoulliDistribution({
               </button>
             </div>
             <p className={styles.distributionDescription}>
-              Un ensayo con dos resultados (0 = fracaso, 1 = éxito). La PMF teórica es P(X=1)=p y P(X=0)=1−p.
+              Número de éxitos en n ensayos independientes con probabilidad p. La PMF teórica es
+              P(X=k) = C(n,k) · p^k · (1−p)^(n−k).
             </p>
           </section>
 
