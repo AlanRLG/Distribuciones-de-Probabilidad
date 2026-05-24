@@ -44,11 +44,9 @@ function normalPDF(x: number, mean: number, std: number): number {
 
 function simulateNormal(mean: number, std: number, sampleSize: number): SimulationResults {
   const samples: number[] = Array.from({ length: sampleSize }, () => randomNormal(mean, std));
-
   const empiricalMean = samples.reduce((acc, value) => acc + value, 0) / sampleSize;
   const empiricalVariance = samples.reduce((acc, value) => acc + (value - empiricalMean) ** 2, 0) / sampleSize;
   const empiricalStd = Math.sqrt(empiricalVariance);
-
   const pdf: ChartData[] = [];
   const minX = mean - 4 * std;
   const maxX = mean + 4 * std;
@@ -58,11 +56,7 @@ function simulateNormal(mean: number, std: number, sampleSize: number): Simulati
     const bandwidth = std / 4;
     const simulated = samples.filter((s) => s >= x - bandwidth && s < x + bandwidth).length / sampleSize / (2 * bandwidth);
 
-    pdf.push({
-      x: Number(x.toFixed(2)),
-      simulated,
-      theoretical
-    });
+    pdf.push({ x: Number(x.toFixed(2)), simulated, theoretical });
   }
 
   return {
@@ -91,12 +85,7 @@ export default function NormalDistribution({ activeDistribution, onDistributionC
 
   const exportToPNG = async () => {
     if (!chartRef.current) return;
-
-    const canvas = await html2canvas(chartRef.current, {
-      backgroundColor: '#0f1520',
-      scale: 2
-    });
-
+    const canvas = await html2canvas(chartRef.current, { backgroundColor: '#0f1520', scale: 2 });
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
     link.download = 'normal.png';

@@ -2,9 +2,9 @@ export const DISTRIBUTIONS = [
   { id: 'bernoulli', label: 'Bernoulli', available: true },
   { id: 'binomial', label: 'Binomial', available: true },
   { id: 'poisson', label: 'Poisson', available: true },
-  { id: 'geometric', label: 'Geométrica', available: false },
-  { id: 'normal', label: 'Normal', available: false },
-  { id: 'exponential', label: 'Exponencial', available: false },
+  { id: 'geometric', label: 'Geométrica', available: true },
+  { id: 'normal', label: 'Normal', available: true },
+  { id: 'exponential', label: 'Exponencial', available: true },
   { id: 'uniform', label: 'Uniforme', available: false },
 ] as const;
 

@@ -3,6 +3,9 @@ import BernoulliDistribution from './components/BernoulliDistribution';
 import BinomialDistribution from './components/BinomialDistribution';
 import type { DistributionId } from './types/distributions';
 import PoissonDistribution from './components/PoissonDistribution';
+import NormalDistribution from './components/NormalDistribution';
+import GeometricDistribution from './components/GeometricDistribution';
+import ExponentialDistribution from './components/ExponentialDistribution';
 
 function App() {
   const [distribution, setDistribution] = useState<DistributionId>('bernoulli');
@@ -19,6 +22,7 @@ function App() {
       />
     );
   }
+
   if (distribution === 'poisson'){
     return(
       <PoissonDistribution
@@ -28,6 +32,33 @@ function App() {
     );
   }
 
+  if(distribution === 'geometric'){
+    return(
+      <GeometricDistribution
+      activeDistribution={distribution}
+      onDistributionChange={handleDistributionChange}
+      />
+    )
+  }
+  
+  if(distribution === 'normal'){
+    return(
+      <NormalDistribution
+      activeDistribution={distribution}
+      onDistributionChange={handleDistributionChange}
+      />
+    )
+  }
+  
+  if(distribution === 'exponential'){
+    return(
+      <ExponentialDistribution
+      activeDistribution={distribution}
+      onDistributionChange={handleDistributionChange}
+      />
+    )
+  }
+  
   return (
     <BernoulliDistribution
       activeDistribution={distribution}
