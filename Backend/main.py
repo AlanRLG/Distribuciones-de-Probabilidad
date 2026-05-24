@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.parametros import ParametrosBinomial, ParametrosNormal, ParametrosGeometrica, ParametrosHiperGeo
-from services.distribuciones import calcularBinomial, calcularNormal, calcularGeometrica, calcularHiperGeo
+from models.parametros import ParametrosBinomial, ParametrosNormal, ParametrosGeometrica, ParametrosHiperGeo, ParametrosPoisson
+from services.distribuciones import calcularBinomial, calcularNormal, calcularGeometrica, calcularHiperGeo, calcularPoisson
 
 
 app = FastAPI()
@@ -49,6 +49,12 @@ def hipergeometrica(params: ParametrosHiperGeo):
 
     return calcularHiperGeo(N,K,n, muestra)
 
+@app.post("/distribuciones/poisson")
+def poisson(params: ParametrosPoisson):
+    lamb = params.lamb
+    muestra = params.muestra
+
+    return calcularPoisson(lamb, muestra)
 
 #continuas
 

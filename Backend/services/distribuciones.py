@@ -109,6 +109,43 @@ def calcularHiperGeo(N,K,n, muestra):
     }
 
 
+def calcularPoisson(lamb, muestra):
+
+    # Primero creas el generador
+    rng = np.random.default_rng()
+    #acomodo para generar una distribucion geometrica
+    datos = rng.poisson( lam=lamb, size=muestra)
+
+    # Estadisticas simuladas
+    mediaDatos = datos.mean()
+    varDatos = datos.var()
+    desvStdDatos = datos.std()
+
+    #valores teoricos
+    mediaCalc = lamb
+    varianzaCalc = lamb
+    desvStdCalc = np.sqrt(lamb)
+
+
+    return {
+        "simulado": {
+            "media": mediaDatos,
+            "varianza": varDatos,
+            "desviacion_estandar": desvStdDatos,
+            "datos": datos.tolist()
+            
+        },
+
+        "teorico": {
+            "media": mediaCalc,
+            "varianza": varianzaCalc,
+            "desviacion_estandar": desvStdCalc,
+        }
+
+    }
+
+
+
 #continuas
 
 

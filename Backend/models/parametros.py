@@ -21,5 +21,9 @@ class ParametrosGeometrica(BaseModel):
 class ParametrosHiperGeo(BaseModel):
     K: int              #pertenecientes a categoria A
     N: int              #size poblacion
-    n: int           #size muestra
+    n: int              #size muestra
+    muestra: int        # valor a evaluar
+
+class ParametrosPoisson(BaseModel):
+    lamb: float            # tasa de aparicion de eventos
     muestra: int        # valor a evaluar
