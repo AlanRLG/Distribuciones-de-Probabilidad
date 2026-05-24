@@ -5,7 +5,7 @@ export const DISTRIBUTIONS = [
   { id: 'geometric', label: 'Geométrica', available: true },
   { id: 'normal', label: 'Normal', available: true },
   { id: 'exponential', label: 'Exponencial', available: true },
-  { id: 'uniform', label: 'Uniforme', available: false },
+  { id: 'uniform', label: 'Uniforme', available: true },
 ] as const;
 
 export type DistributionId = (typeof DISTRIBUTIONS)[number]['id'];
