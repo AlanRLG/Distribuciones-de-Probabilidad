@@ -14,4 +14,6 @@ class ParametrosNormal(BaseModel):
     desviacion: float
     muestra: int
 
-# etc...
+class ParametrosGeometrica(BaseModel):
+    p: float            # probabilidad de éxito
+    muestra: int        # valor a evaluar

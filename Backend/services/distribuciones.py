@@ -34,6 +34,43 @@ def calcularBinomial(n, p, x):
         }
     }
 
+
+def calcularGeometrica(probabilidad, muestra):
+
+    # Primero creas el generador
+    rng = np.random.default_rng()
+    #acomodo para generar una distribucion geometrica
+    datos = rng.geometric(p=probabilidad, size=muestra)
+
+    # Estadisticas simuladas
+    mediaDatos = datos.mean()
+    varDatos = datos.var()
+    desvStdDatos = datos.std()
+
+    #valores teoricos
+    mediaCalc = 1 / probabilidad
+    varianzaCalc = (1-probabilidad) / (probabilidad**2)
+    desvStdCalc = np.sqrt(varianzaCalc)
+
+
+    return {
+        "simulado": {
+            "media": mediaDatos,
+            "varianza": varDatos,
+            "desviacion_estandar": desvStdDatos,
+            "datos": datos.tolist()
+            
+        },
+
+        "teorico": {
+            "media": mediaCalc,
+            "varianza": varianzaCalc,
+            "desviacion_estandar": desvStdCalc,
+        }
+
+    }
+
+
 def calcularNormal(media, desviacion, muestra):
 
     # Datos simulados

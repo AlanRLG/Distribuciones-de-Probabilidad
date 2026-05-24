@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.parametros import ParametrosBinomial, ParametrosNormal
-from services.distribuciones import calcularBinomial, calcularNormal
+from models.parametros import ParametrosBinomial, ParametrosNormal, ParametrosGeometrica
+from services.distribuciones import calcularBinomial, calcularNormal, calcularGeometrica
 
 
 app = FastAPI()
@@ -23,6 +23,7 @@ app.add_middleware(
 def root():
     return {"message": "API funcionando"}
 
+#discretas
 
 @app.post("/distribuciones/binomial")
 def binomial(params: ParametrosBinomial):
@@ -31,6 +32,18 @@ def binomial(params: ParametrosBinomial):
     x = params.x
 
     return calcularBinomial(n,p,x)
+
+@app.post("/distribuciones/geometrica")
+def geometrica(params: ParametrosGeometrica):
+    p = params.p
+    muestra = params.muestra
+
+    return calcularGeometrica(p, muestra)
+
+
+
+#continuas
+
 
 @app.post("/distribuciones/normal")
 def normal(params: ParametrosNormal):
