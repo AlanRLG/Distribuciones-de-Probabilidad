@@ -182,3 +182,44 @@ def calcularNormal(media, desviacion, muestra):
         }
 
     }
+
+
+def calcularUniforme(a, b, muestra):
+
+    # Datos simulados
+    rng = np.random.default_rng()
+    datos = rng.uniform(low=a, high=b, size=muestra)
+    
+    # Estadisticas simuladas
+    mediaDatos = datos.mean()
+    varDatos = datos.var()
+    desvStdDatos = datos.std()
+
+    #valores teoricos
+    mediaCalc = (a+b)/2
+    varianzaCalc = ((b-a)**2)/12 
+    desvStdCalc = np.sqrt(varianzaCalc)
+
+    # Curva teorica para graficar
+    x_vals = np.linspace(a - 1, b + 1, 200)
+    y_vals = stats.uniform.pdf(x_vals, loc=a, scale=b-a)
+
+
+    return {
+        "simulado": {
+            "media": mediaDatos,
+            "varianza": varDatos,
+            "desviacion_estandar": desvStdDatos,
+            "datos": datos.tolist()
+            
+        },
+
+        "teorico": {
+            "media": mediaCalc,
+            "varianza": varianzaCalc,
+            "desviacion_estandar": desvStdCalc,
+            "x_vals": x_vals.tolist(),  # eje X de la campana
+            "y_vals": y_vals.tolist()   # eje Y de la campana
+        }
+
+    }

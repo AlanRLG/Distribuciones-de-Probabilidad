@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.parametros import ParametrosBinomial, ParametrosNormal, ParametrosGeometrica, ParametrosHiperGeo, ParametrosPoisson
-from services.distribuciones import calcularBinomial, calcularNormal, calcularGeometrica, calcularHiperGeo, calcularPoisson
+from models.parametros import ParametrosBinomial, ParametrosNormal, ParametrosGeometrica, ParametrosHiperGeo, ParametrosPoisson, ParametrosUniforme
+from services.distribuciones import calcularBinomial, calcularNormal, calcularGeometrica, calcularHiperGeo, calcularPoisson, calcularUniforme
 
 
 app = FastAPI()
@@ -66,3 +66,11 @@ def normal(params: ParametrosNormal):
     muestra = params.muestra
 
     return calcularNormal(media, desviacion, muestra)
+
+@app.post("/distribuciones/uniforme")
+def uniforme(params: ParametrosUniforme):
+    a = params.a
+    b = params.b
+    muestra = params.muestra
+
+    return calcularUniforme(a, b, muestra)

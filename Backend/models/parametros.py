@@ -9,10 +9,7 @@ class ParametrosPoisson(BaseModel):
     lam: float    # lambda, tasa de ocurrencia
     x: int        # valor a evaluar
 
-class ParametrosNormal(BaseModel):
-    media: float
-    desviacion: float
-    muestra: int
+
 
 class ParametrosGeometrica(BaseModel):
     p: float            # probabilidad de éxito
@@ -27,3 +24,13 @@ class ParametrosHiperGeo(BaseModel):
 class ParametrosPoisson(BaseModel):
     lamb: float            # tasa de aparicion de eventos
     muestra: int        # valor a evaluar
+
+class ParametrosNormal(BaseModel):
+    media: float
+    desviacion: float
+    muestra: int
+
+class ParametrosUniforme(BaseModel):
+    a: float
+    b: float
+    muestra: int    
