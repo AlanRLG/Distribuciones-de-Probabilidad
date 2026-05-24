@@ -1,68 +1,34 @@
-import { useState } from 'react';
+import { useState, type ComponentType } from 'react';
 import BernoulliDistribution from './components/BernoulliDistribution';
 import BinomialDistribution from './components/BinomialDistribution';
-import type { DistributionId } from './types/distributions';
 import PoissonDistribution from './components/PoissonDistribution';
-import NormalDistribution from './components/NormalDistribution';
 import GeometricDistribution from './components/GeometricDistribution';
+import NormalDistribution from './components/NormalDistribution';
 import ExponentialDistribution from './components/ExponentialDistribution';
+import UniformDistribution from './components/UniformDistribution';
+import type { DistributionId, DistributionPageProps } from './types/distributions';
+
+const DISTRIBUTION_COMPONENTS: Record<
+  DistributionId,
+  ComponentType<DistributionPageProps>
+> = {
+  bernoulli: BernoulliDistribution,
+  binomial: BinomialDistribution,
+  poisson: PoissonDistribution,
+  geometric: GeometricDistribution,
+  normal: NormalDistribution,
+  exponential: ExponentialDistribution,
+  uniform: UniformDistribution,
+};
 
 function App() {
   const [distribution, setDistribution] = useState<DistributionId>('bernoulli');
+  const ActiveDistribution = DISTRIBUTION_COMPONENTS[distribution];
 
-  const handleDistributionChange = (id: DistributionId) => {
-    setDistribution(id);
-  };
-
-  if (distribution === 'binomial') {
-    return (
-      <BinomialDistribution
-        activeDistribution={distribution}
-        onDistributionChange={handleDistributionChange}
-      />
-    );
-  }
-
-  if (distribution === 'poisson'){
-    return(
-      <PoissonDistribution
-      activeDistribution={distribution}
-      onDistributionChange={handleDistributionChange}
-      />
-    );
-  }
-
-  if(distribution === 'geometric'){
-    return(
-      <GeometricDistribution
-      activeDistribution={distribution}
-      onDistributionChange={handleDistributionChange}
-      />
-    )
-  }
-  
-  if(distribution === 'normal'){
-    return(
-      <NormalDistribution
-      activeDistribution={distribution}
-      onDistributionChange={handleDistributionChange}
-      />
-    )
-  }
-  
-  if(distribution === 'exponential'){
-    return(
-      <ExponentialDistribution
-      activeDistribution={distribution}
-      onDistributionChange={handleDistributionChange}
-      />
-    )
-  }
-  
   return (
-    <BernoulliDistribution
+    <ActiveDistribution
       activeDistribution={distribution}
-      onDistributionChange={handleDistributionChange}
+      onDistributionChange={setDistribution}
     />
   );
 }
