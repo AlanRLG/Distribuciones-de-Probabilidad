@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📊 Probability-Distributions
+# 📊 Probability Distributions
 
 [![Frontend](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -10,7 +10,7 @@
 [![Subject](https://img.shields.io/badge/Subject-Probability%20%26%20Statistics-2E8B57?style=for-the-badge)]()
 [![Status](https://img.shields.io/badge/Status-In%20Development-yellow?style=for-the-badge)]()
 
-<p><em>Interactive web application for probability distributions visualization and statistical calculations developed for the Probability and Statistics course at ESCOM – IPN.</em></p>
+<p><em>Interactive web application for probability distributions visualization and statistical calculations, developed for the Probability and Statistics course at ESCOM – IPN.</em></p>
 
 </div>
 
@@ -34,13 +34,13 @@ The application allows users to:
 ## 📂 Repository Structure
 
 ```text
-Probability-Distributions/
+Distribuciones-de-Probabilidad/
 │
-├── frontend/               # React + TypeScript frontend
+├── Frontend/               # React + TypeScript frontend
 │   ├── src/
 │   └── ...
 │
-├── backend/                # FastAPI backend
+├── Backend/                # FastAPI backend (Python)
 │   ├── main.py
 │   └── ...
 │
@@ -52,37 +52,39 @@ Probability-Distributions/
 
 ## 📈 Implemented Distributions
 
-| Distribution | Description | Status |
-|---|---|---|
-| Binomial | Discrete probability distribution | 🚧 |
-| Poisson | Event occurrence modeling | 🚧 |
-| Hypergeometric | Sampling without replacement | 🚧 |
-| Normal | Continuous probability distribution | 🔜 |
-| Exponential | Time between events modeling | 🔜 |
-
-> More statistical distributions and features will be added as the project evolves.
+| Distribution | Description |
+|---|---|
+| Bernoulli | Models a single trial with two possible outcomes: success or failure |
+| Binomial | Models the number of successes in a fixed number of independent Bernoulli trials |
+| Poisson | Models the number of events occurring in a fixed interval of time or space |
+| Geometric | Models the number of trials needed to get the first success |
+| Normal | Continuous symmetric distribution defined by its mean and standard deviation |
+| Exponential | Models the time between consecutive events in a Poisson process |
+| Uniform | All outcomes in a given range are equally likely |
 
 ---
 
-## 🛠️ Technologies Used
+## 📦 Libraries Used
 
 ### Frontend
-- ⚛️ React
-- 🔷 TypeScript
-- 📡 Axios
-- 📊 Plotly.js
+| Library | Purpose |
+|---|---|
+| [React](https://react.dev/) | UI component framework |
+| [TypeScript](https://www.typescriptlang.org/) | Typed superset of JavaScript |
+| [Axios](https://axios-http.com/) | HTTP client for API requests |
+| [Plotly.js](https://plotly.com/javascript/) | Interactive distribution charts |
 
 ### Backend
-- ⚡ FastAPI
-- 🐍 Python
-- 🔢 NumPy
-- 📉 SciPy
+| Library | Purpose |
+|---|---|
+| [FastAPI](https://fastapi.tiangolo.com/) | REST API framework |
+| [NumPy](https://numpy.org/) | Numerical computations and array operations |
+| [SciPy](https://scipy.org/) | Statistical distributions and probability functions |
+| [Uvicorn](https://www.uvicorn.org/) | ASGI server to run the FastAPI app |
 
 ---
 
 ## 🧠 Topics & Concepts
-
-The following Probability & Statistics concepts are explored throughout this project:
 
 - 📊 Probability Distributions
 - 🎲 Discrete Random Variables
@@ -96,117 +98,152 @@ The following Probability & Statistics concepts are explored throughout this pro
 
 ---
 
-## ⚙️ Getting Started
-
-### Prerequisites
+## ⚙️ Prerequisites
 
 Make sure you have installed:
 
-- Node.js
-- Python 3.10+
-- pip
-- npm
+| Tool    | Min. Version | Download |
+|---------|-------------|----------|
+| Node.js | 18+         | [nodejs.org](https://nodejs.org/) |
+| npm     | 9+          | Included with Node.js |
+| Python  | 3.10+       | [python.org](https://www.python.org/) |
+| pip     | Any         | Included with Python |
 
 ---
 
-# 🚀 Installation
+## 🚀 Installation
 
-## Clone the repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Probability-Distributions.git
-cd Probability-Distributions
+git clone https://github.com/AlanRLG/Distribuciones-de-Probabilidad.git
+cd Distribuciones-de-Probabilidad
 ```
 
 ---
 
-## 🔧 Backend Setup
+### 2. Backend Setup
 
 ```bash
-cd backend
+cd Backend
 
 # Create virtual environment
-python3 -m venv venv
+python -m venv venv
 
 # Activate virtual environment
+# On Linux / macOS:
 source venv/bin/activate
+# On Windows (CMD):
+venv\Scripts\activate.bat
+# On Windows (PowerShell):
+venv\Scripts\Activate.ps1
 
 # Install dependencies
 pip install fastapi uvicorn scipy numpy
 
-# Run backend server
+# Start the server
 uvicorn main:app --reload
 ```
 
-Backend will run on:
+The backend will be available at:
 
-```text
+```
 http://127.0.0.1:8000
 ```
 
+> 💡 You can explore the automatic API documentation at `http://127.0.0.1:8000/docs`
+
 ---
 
-## 💻 Frontend Setup
+### 3. Frontend Setup
 
-Open another terminal:
+Open **another terminal** (keep the backend running):
 
 ```bash
-cd frontend
+cd Frontend
 
 # Install dependencies
 npm install
 
-# Run development server
+# Start the development server
 npm run dev
 ```
 
-Frontend will run on:
+The frontend will be available at:
 
-```text
+```
 http://localhost:5173
 ```
+
+---
+
+## 🖥️ Usage
+
+1. Make sure **both servers** (backend and frontend) are running simultaneously.
+2. Open `http://localhost:5173` in your browser.
+3. Select the probability distribution you want to analyze.
+4. Adjust the distribution parameters using the interactive controls.
+5. Observe the generated chart (PMF/PDF and CDF) and the calculated statistical values (mean, variance, etc.).
 
 ---
 
 ## 📊 Features
 
 - Interactive probability calculations
-- Dynamic graphical visualization
+- Dynamic graphical visualization with Plotly.js
 - Modern responsive UI
 - Real-time parameter updates
-- API-based architecture
-- Statistical analysis tools
+- REST API-based architecture
+- Automatic API documentation (Swagger UI)
 
 ---
 
 ## 🎯 Future Improvements
 
-- Export graphs as images
-- Dark/Light mode
-- Step-by-step calculations
-- Distribution comparison tools
-- Statistical simulations
-- Confidence intervals
-- Hypothesis testing
+- [ ] Export graphs as images
+- [ ] Dark / Light mode
+- [ ] Step-by-step calculations
+- [ ] Distribution comparison tools
+- [ ] Statistical simulations
+- [ ] Confidence intervals
+- [ ] Hypothesis testing
 
 ---
 
 ## 👨‍💻 Author
 
-**AlanRLG**
+**Alan Leaños**
+
+> Computer Systems student at ESCOM – IPN 
+
+[![GitHub](https://img.shields.io/badge/GitHub-AlanRLG-181717?style=flat-square&logo=github)](https://github.com/AlanRLG)
+
+**Omar Barron**
+
+> Computer Systems student at ESCOM – IPN 
+
+[![GitHub](https://img.shields.io/badge/GitHub-FairerFilly6-181717?style=flat-square&logo=github)](https://github.com/FairerFilly6)
+
+**Christopher Gonzalez**
+
+![Github](https://github.com/sierraGC1)
+
+> Computer Systems student at ESCOM – IPN 
+
+**Salomon Barrero**
 
 > Computer Systems student at ESCOM – IPN
 
-[![GitHub](https://img.shields.io/badge/GitHub-AlanRLG-181717?style=flat-square&logo=github)](https://github.com/AlanRLG)
+![Github](https://github.com/subparbard251)
 
 ---
 
 ## 📄 License
 
-This repository is for **educational purposes**. Feel free to use it as reference for learning.
+This repository is for **educational purposes**. Feel free to use it as a reference for learning.
 
 ---
 
 <div align="center">
-  <sub>Made with 💻 and 📊 at ESCOM – IPN · Computational Systems</sub>
+  <sub>Made with 💻 and 📊 at ESCOM – IPN · Computer Systems Engineering</sub>
 </div>
