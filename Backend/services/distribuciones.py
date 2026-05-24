@@ -189,7 +189,7 @@ def calcularUniforme(a, b, muestra):
     # Datos simulados
     rng = np.random.default_rng()
     datos = rng.uniform(low=a, high=b, size=muestra)
-    
+
     # Estadisticas simuladas
     mediaDatos = datos.mean()
     varDatos = datos.var()
@@ -203,6 +203,48 @@ def calcularUniforme(a, b, muestra):
     # Curva teorica para graficar
     x_vals = np.linspace(a - 1, b + 1, 200)
     y_vals = stats.uniform.pdf(x_vals, loc=a, scale=b-a)
+
+
+    return {
+        "simulado": {
+            "media": mediaDatos,
+            "varianza": varDatos,
+            "desviacion_estandar": desvStdDatos,
+            "datos": datos.tolist()
+            
+        },
+
+        "teorico": {
+            "media": mediaCalc,
+            "varianza": varianzaCalc,
+            "desviacion_estandar": desvStdCalc,
+            "x_vals": x_vals.tolist(),  # eje X de la campana
+            "y_vals": y_vals.tolist()   # eje Y de la campana
+        }
+
+    }
+
+
+def calcularExponencial(media, muestra):
+    lamb = 1/media
+
+    # Datos simulados
+    rng = np.random.default_rng()
+    datos = rng.exponential(scale=media, size=muestra)
+
+    # Estadisticas simuladas
+    mediaDatos = datos.mean()
+    varDatos = datos.var()
+    desvStdDatos = datos.std()
+
+    #valores teoricos
+    mediaCalc = 1/lamb                      #aqui se puede alternar a media
+    varianzaCalc = 1/(lamb**2)              #aqui se puede alternar a media**2
+    desvStdCalc = np.sqrt(varianzaCalc)     #aqui media
+
+    # Curva teorica para graficar
+    x_vals = np.linspace(0, media * 5, 200)  # empieza en 0, nunca negativo
+    y_vals = stats.expon.pdf(x_vals, scale=media)
 
 
     return {

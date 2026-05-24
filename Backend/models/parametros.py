@@ -34,3 +34,7 @@ class ParametrosUniforme(BaseModel):
     a: float
     b: float
     muestra: int    
+
+class ParametrosExponencial(BaseModel):
+    media: float
+    muestra: int
