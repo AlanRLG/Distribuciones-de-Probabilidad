@@ -17,3 +17,9 @@ class ParametrosNormal(BaseModel):
 class ParametrosGeometrica(BaseModel):
     p: float            # probabilidad de éxito
     muestra: int        # valor a evaluar
+
+class ParametrosHiperGeo(BaseModel):
+    K: int              #pertenecientes a categoria A
+    N: int              #size poblacion
+    n: int           #size muestra
+    muestra: int        # valor a evaluar

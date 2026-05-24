@@ -1,6 +1,8 @@
 import numpy as np
 from scipy import stats
 
+#discretas
+
 def calcularBinomial(n, p, x):
 
     # muestra = 1000 significa que repites el experimento 1000 veces
@@ -69,6 +71,45 @@ def calcularGeometrica(probabilidad, muestra):
         }
 
     }
+
+
+def calcularHiperGeo(N,K,n, muestra):
+
+    # Primero creas el generador
+    rng = np.random.default_rng()
+    #acomodo para generar una distribucion geometrica
+    datos = rng.hypergeometric( nbad= N-K , ngood=K , nsample=n ,  size=muestra)
+
+    # Estadisticas simuladas
+    mediaDatos = datos.mean()
+    varDatos = datos.var()
+    desvStdDatos = datos.std()
+
+    #valores teoricos
+    mediaCalc = n * (K/N)
+    varianzaCalc = n * (K/N) * ((N-K)/N) * ((N-n)/(N-1))
+    desvStdCalc = np.sqrt(varianzaCalc)
+
+
+    return {
+        "simulado": {
+            "media": mediaDatos,
+            "varianza": varDatos,
+            "desviacion_estandar": desvStdDatos,
+            "datos": datos.tolist()
+            
+        },
+
+        "teorico": {
+            "media": mediaCalc,
+            "varianza": varianzaCalc,
+            "desviacion_estandar": desvStdCalc,
+        }
+
+    }
+
+
+#continuas
 
 
 def calcularNormal(media, desviacion, muestra):
