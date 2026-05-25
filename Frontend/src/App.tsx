@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from 'react';
+import { useState, type ComponentType, useEffect } from 'react';
 import BernoulliDistribution from './components/BernoulliDistribution';
 import BinomialDistribution from './components/BinomialDistribution';
 import PoissonDistribution from './components/PoissonDistribution';
@@ -22,14 +22,26 @@ const DISTRIBUTION_COMPONENTS: Record<
 };
 
 function App() {
+  const [mensaje, setMensaje] = useState('')
   const [distribution, setDistribution] = useState<DistributionId>('bernoulli');
   const ActiveDistribution = DISTRIBUTION_COMPONENTS[distribution];
 
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/')
+      .then(res => res.json())
+      .then(data => {
+        setMensaje(data.message)
+      })
+  }, [])
+
   return (
-    <ActiveDistribution
+    <div>
+      <h1>{mensaje}</h1>
+      <ActiveDistribution
       activeDistribution={distribution}
-      onDistributionChange={setDistribution}
-    />
+        onDistributionChange={setDistribution}
+      />
+    </div>
   );
 }
 
