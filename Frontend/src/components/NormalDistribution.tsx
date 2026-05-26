@@ -1,91 +1,62 @@
-import { useState } from 'react';
-import type { DistributionPageProps } from '../types/distributions';
-import type { ContinuousSimulationResults } from '../types/simulation';
-import { computeSampleStats } from '../utils/statistics';
+import { useCallback, useState } from 'react';
+import { distributionApi } from '../api/client';
 import { useChartExport } from '../hooks/useChartExport';
-import DistributionLayout from './shared/DistributionLayout';
+import { useSimulation } from '../hooks/useSimulation';
+import type { DistributionPageProps } from '../types/distributions';
+import { mapNormalResponse } from '../utils/apiMappers';
+import ChartLoading from './shared/ChartLoading';
 import ChartSection from './shared/ChartSection';
 import ControlsSection from './shared/ControlsSection';
+import DistributionLayout from './shared/DistributionLayout';
 import ParameterField from './shared/ParameterField';
-import SimulateButton from './shared/SimulateButton';
 import PdfLineChart from './shared/PdfLineChart';
+import SimulateButton from './shared/SimulateButton';
+import SimulationError from './shared/SimulationError';
 import SimulationInsights from './shared/SimulationInsights';
 
-function randomNormal(mean: number, std: number): number {
-  const u1 = Math.random();
-  const u2 = Math.random();
-  const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-  return mean + std * z;
-}
-
-function normalPdf(x: number, mean: number, std: number): number {
-  return (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-((x - mean) ** 2) / (2 * std ** 2));
-}
-
-function simulateNormal(mean: number, std: number, sampleSize: number): ContinuousSimulationResults {
-  const clampedStd = Math.max(0.1, std);
-  const samples = Array.from({ length: sampleSize }, () => randomNormal(mean, clampedStd));
-  const stats = computeSampleStats(samples);
-  const pdf: ContinuousSimulationResults['pdf'] = [];
-  const minX = mean - 4 * clampedStd;
-  const maxX = mean + 4 * clampedStd;
-
-  for (let x = minX; x <= maxX; x += clampedStd / 5) {
-    const theoretical = normalPdf(x, mean, clampedStd);
-    const bandwidth = clampedStd / 4;
-    const simulated =
-      samples.filter((sample) => sample >= x - bandwidth && sample < x + bandwidth).length /
-      sampleSize /
-      (2 * bandwidth);
-
-    pdf.push({
-      x: Number(x.toFixed(2)),
-      simulated,
-      theoretical,
-    });
-  }
-
-  return {
-    ...stats,
-    theoretical_mean: mean,
-    theoretical_variance: clampedStd ** 2,
-    theoretical_std: clampedStd,
-    pdf,
-  };
-}
-
-const initialResults = simulateNormal(0, 1, 5000);
+const EMPTY_STATS = {
+  empirical_mean: 0,
+  theoretical_mean: 0,
+  empirical_variance: 0,
+  theoretical_variance: 0,
+  empirical_std: 0,
+  theoretical_std: 0,
+};
 
 export default function NormalDistribution({
   activeDistribution,
   onDistributionChange,
+  apiConnected,
 }: DistributionPageProps) {
   const [mean, setMean] = useState(0);
   const [std, setStd] = useState(1);
   const [sampleSize, setSampleSize] = useState(5000);
-  const [results, setResults] = useState(initialResults);
+
+  const run = useCallback(async () => {
+    const response = await distributionApi.normal(mean, Math.max(0.1, std), Math.max(100, sampleSize));
+    return mapNormalResponse(response);
+  }, [mean, std, sampleSize]);
+
+  const { results, loading, error, execute } = useSimulation({ run });
   const { chartRef, exportToCSV, exportToPNG } = useChartExport(
-    results,
+    results ?? EMPTY_STATS,
     `normal_mu${mean}_sigma${std}_N${sampleSize}`,
   );
-
-  const handleSimulate = () => {
-    setResults(simulateNormal(mean, std, Math.max(100, sampleSize)));
-  };
 
   return (
     <DistributionLayout
       activeDistribution={activeDistribution}
       onDistributionChange={onDistributionChange}
+      apiConnected={apiConnected}
     >
       <ChartSection
         title={`Normal(μ=${mean}, σ=${std})`}
         subtitle={`Densidad simulada vs PDF teórica · N = ${sampleSize.toLocaleString('es-MX')}`}
         chartRef={chartRef}
-        onExportCSV={exportToCSV}
+        onExportCSV={results ? exportToCSV : undefined}
         onExportPNG={exportToPNG}
       >
-        <PdfLineChart data={results.pdf} />
+        {loading || !results ? <ChartLoading /> : <PdfLineChart data={results.pdf} />}
       </ChartSection>
 
       <ControlsSection description="Modela fenómenos continuos con forma de campana. La media teórica es μ y la varianza es σ².">
@@ -115,14 +86,17 @@ export default function NormalDistribution({
           value={sampleSize}
           onChange={(e) => setSampleSize(Math.max(100, parseInt(e.target.value, 10) || 1000))}
         />
-        <SimulateButton onClick={handleSimulate} />
+        <SimulateButton onClick={() => void execute()} loading={loading} />
       </ControlsSection>
 
-      <SimulationInsights
-        results={results}
-        sampleSize={sampleSize}
-        convergenceHint="Al aumentar N, la curva simulada se acerca a la PDF teórica y los estadísticos empíricos convergen a μ y σ²."
-      />
+      {error && <SimulationError message={error} />}
+      {results && (
+        <SimulationInsights
+          results={results}
+          sampleSize={sampleSize}
+          convergenceHint="Al aumentar N, la curva simulada se acerca a la PDF teórica y los estadísticos empíricos convergen a μ y σ²."
+        />
+      )}
     </DistributionLayout>
   );
 }

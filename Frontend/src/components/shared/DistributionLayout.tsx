@@ -5,12 +5,14 @@ import { DISTRIBUTIONS, type DistributionId } from '../../types/distributions';
 interface DistributionLayoutProps {
   activeDistribution: DistributionId | string;
   onDistributionChange: (id: DistributionId) => void;
+  apiConnected?: boolean;
   children: ReactNode;
 }
 
 export default function DistributionLayout({
   activeDistribution,
   onDistributionChange,
+  apiConnected,
   children,
 }: DistributionLayoutProps) {
   return (
@@ -20,7 +22,19 @@ export default function DistributionLayout({
           <div className={styles.logoIcon}>Σ</div>
           <div className={styles.headerTitle}>
             <h1>Simulador de Distribuciones</h1>
-            <p>Probabilidad y Estadística</p>
+            <p>
+              Probabilidad y Estadística
+              {apiConnected !== undefined && (
+                <span
+                  style={{
+                    marginLeft: '0.5rem',
+                    color: apiConnected ? '#4ade80' : '#f87171',
+                  }}
+                >
+                  · Backend {apiConnected ? 'conectado' : 'desconectado'}
+                </span>
+              )}
+            </p>
           </div>
         </div>
 

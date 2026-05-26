@@ -3,6 +3,32 @@ from scipy import stats
 
 #discretas
 
+def calcularBernoulli(p, muestra):
+    datos = np.random.binomial(1, p, muestra)
+
+    mediaDatos = datos.mean()
+    varDatos = datos.var()
+    desvStdDatos = datos.std()
+
+    mediaCalc = p
+    varCalc = p * (1 - p)
+    desvStdCalc = np.sqrt(varCalc)
+
+    return {
+        "simulado": {
+            "media": float(mediaDatos),
+            "varianza": float(varDatos),
+            "desviacion_estandar": float(desvStdDatos),
+            "datos": datos.tolist(),
+        },
+        "teorico": {
+            "media": float(mediaCalc),
+            "varianza": float(varCalc),
+            "desviacion_estandar": float(desvStdCalc),
+        },
+    }
+
+
 def calcularBinomial(n, p, x):
 
     # muestra = 1000 significa que repites el experimento 1000 veces

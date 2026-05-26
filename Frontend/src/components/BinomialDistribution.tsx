@@ -1,93 +1,62 @@
-import { useState } from 'react';
-import type { DistributionPageProps } from '../types/distributions';
-import type { DiscreteSimulationResults } from '../types/simulation';
-import { computeSampleStats } from '../utils/statistics';
+import { useCallback, useState } from 'react';
+import { distributionApi } from '../api/client';
 import { useChartExport } from '../hooks/useChartExport';
-import DistributionLayout from './shared/DistributionLayout';
+import { useSimulation } from '../hooks/useSimulation';
+import type { DistributionPageProps } from '../types/distributions';
+import { mapBinomialResponse } from '../utils/apiMappers';
+import ChartLoading from './shared/ChartLoading';
 import ChartSection from './shared/ChartSection';
 import ControlsSection from './shared/ControlsSection';
+import DistributionLayout from './shared/DistributionLayout';
 import ParameterField from './shared/ParameterField';
-import SimulateButton from './shared/SimulateButton';
 import PmfBarChart from './shared/PmfBarChart';
+import SimulateButton from './shared/SimulateButton';
+import SimulationError from './shared/SimulationError';
 import SimulationInsights from './shared/SimulationInsights';
 
-function binomialCoeff(n: number, k: number): number {
-  if (k < 0 || k > n) return 0;
-  let result = 1;
-  for (let i = 0; i < k; i++) {
-    result = (result * (n - i)) / (i + 1);
-  }
-  return result;
-}
-
-function theoreticalBinomialPmf(n: number, p: number, k: number): number {
-  return binomialCoeff(n, k) * p ** k * (1 - p) ** (n - k);
-}
-
-function simulateBinomial(n: number, p: number, sampleSize: number): DiscreteSimulationResults {
-  const clampedP = Math.min(1, Math.max(0, p));
-  const clampedN = Math.max(1, Math.min(50, Math.floor(n)));
-  const nSamples = Math.max(1, sampleSize);
-  const counts = new Array<number>(clampedN + 1).fill(0);
-  const trialValues: number[] = [];
-
-  for (let i = 0; i < nSamples; i++) {
-    let successes = 0;
-    for (let j = 0; j < clampedN; j++) {
-      if (Math.random() < clampedP) successes++;
-    }
-    counts[successes]++;
-    trialValues.push(successes);
-  }
-
-  const stats = computeSampleStats(trialValues);
-  const theoreticalVariance = clampedN * clampedP * (1 - clampedP);
-
-  return {
-    ...stats,
-    theoretical_mean: clampedN * clampedP,
-    theoretical_variance: theoreticalVariance,
-    theoretical_std: Math.sqrt(theoreticalVariance),
-    pmf: Array.from({ length: clampedN + 1 }, (_, k) => ({
-      k,
-      simulated: counts[k] / nSamples,
-      theoretical: theoreticalBinomialPmf(clampedN, clampedP, k),
-    })),
-  };
-}
-
-const initialResults = simulateBinomial(10, 0.5, 1000);
+const EMPTY_STATS = {
+  empirical_mean: 0,
+  theoretical_mean: 0,
+  empirical_variance: 0,
+  theoretical_variance: 0,
+  empirical_std: 0,
+  theoretical_std: 0,
+};
 
 export default function BinomialDistribution({
   activeDistribution,
   onDistributionChange,
+  apiConnected,
 }: DistributionPageProps) {
   const [p, setP] = useState(0.5);
   const [n, setN] = useState(10);
   const [sampleSize, setSampleSize] = useState(1000);
-  const [results, setResults] = useState(initialResults);
+
+  const run = useCallback(async () => {
+    const response = await distributionApi.binomial(n, p, Math.max(1, sampleSize));
+    return mapBinomialResponse(response, n, p);
+  }, [n, p, sampleSize]);
+
+  const { results, loading, error, execute } = useSimulation({ run });
   const { chartRef, exportToCSV, exportToPNG } = useChartExport(
-    results,
+    results ?? EMPTY_STATS,
     `binomial_n${n}_p${p}_N${sampleSize}`,
   );
-
-  const handleSimulate = () => {
-    setResults(simulateBinomial(n, p, Math.max(1, sampleSize)));
-  };
 
   return (
     <DistributionLayout
       activeDistribution={activeDistribution}
       onDistributionChange={onDistributionChange}
+      apiConnected={apiConnected}
     >
       <ChartSection
         title={`Binomial(n=${n}, p=${p.toFixed(2)})`}
         subtitle={`Frecuencia relativa simulada vs PMF teórica · N = ${sampleSize.toLocaleString('es-MX')}`}
         chartRef={chartRef}
-        onExportCSV={exportToCSV}
+        onExportCSV={results ? exportToCSV : undefined}
         onExportPNG={exportToPNG}
       >
-        <PmfBarChart data={results.pmf} />
+        {loading || !results ? <ChartLoading /> : <PmfBarChart data={results.pmf} />}
       </ChartSection>
 
       <ControlsSection description="Número de éxitos en n ensayos independientes con probabilidad p. La PMF teórica es P(X=k) = C(n,k) · p^k · (1−p)^(n−k).">
@@ -120,14 +89,17 @@ export default function BinomialDistribution({
           value={sampleSize}
           onChange={(e) => setSampleSize(Math.max(1, parseInt(e.target.value, 10) || 1))}
         />
-        <SimulateButton onClick={handleSimulate} />
+        <SimulateButton onClick={() => void execute()} loading={loading} />
       </ControlsSection>
 
-      <SimulationInsights
-        results={results}
-        sampleSize={sampleSize}
-        convergenceHint="Al aumentar N, la media empírica converge a n·p y las barras simuladas se acercan a la PMF teórica. Prueba N = 50,000 para verlo con claridad."
-      />
+      {error && <SimulationError message={error} />}
+      {results && (
+        <SimulationInsights
+          results={results}
+          sampleSize={sampleSize}
+          convergenceHint="Al aumentar N, la media empírica converge a n·p y las barras simuladas se acercan a la PMF teórica."
+        />
+      )}
     </DistributionLayout>
   );
 }

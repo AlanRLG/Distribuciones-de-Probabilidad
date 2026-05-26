@@ -1,14 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.parametros import ParametrosBinomial, ParametrosNormal, ParametrosGeometrica, ParametrosHiperGeo, ParametrosPoisson, ParametrosUniforme, ParametrosExponencial
-from services.distribuciones import calcularBinomial, calcularNormal, calcularGeometrica, calcularHiperGeo, calcularPoisson, calcularUniforme, calcularExponencial
+from models.parametros import ParametrosBernoulli, ParametrosBinomial, ParametrosNormal, ParametrosGeometrica, ParametrosHiperGeo, ParametrosPoisson, ParametrosUniforme, ParametrosExponencial
+from services.distribuciones import calcularBernoulli, calcularBinomial, calcularNormal, calcularGeometrica, calcularHiperGeo, calcularPoisson, calcularUniforme, calcularExponencial
 
 
 app = FastAPI()
 
 origins = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
@@ -24,6 +25,10 @@ def root():
     return {"message": "API funcionando"}
 
 #discretas
+
+@app.post("/distribuciones/bernoulli")
+def bernoulli(params: ParametrosBernoulli):
+    return calcularBernoulli(params.p, params.muestra)
 
 @app.post("/distribuciones/binomial")
 def binomial(params: ParametrosBinomial):

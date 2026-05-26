@@ -1,4 +1,5 @@
-import { useState, type ComponentType, useEffect } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
+import { checkApiHealth } from './api/client';
 import BernoulliDistribution from './components/BernoulliDistribution';
 import BinomialDistribution from './components/BinomialDistribution';
 import PoissonDistribution from './components/PoissonDistribution';
@@ -22,26 +23,23 @@ const DISTRIBUTION_COMPONENTS: Record<
 };
 
 function App() {
-  const [mensaje, setMensaje] = useState('')
   const [distribution, setDistribution] = useState<DistributionId>('bernoulli');
-  const ActiveDistribution = DISTRIBUTION_COMPONENTS[distribution];
+  const [apiConnected, setApiConnected] = useState(false);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/')
-      .then(res => res.json())
-      .then(data => {
-        setMensaje(data.message)
-      })
-  }, [])
+    checkApiHealth()
+      .then(() => setApiConnected(true))
+      .catch(() => setApiConnected(false));
+  }, []);
+
+  const ActiveDistribution = DISTRIBUTION_COMPONENTS[distribution];
 
   return (
-    <div>
-      <h1>{mensaje}</h1>
-      <ActiveDistribution
+    <ActiveDistribution
       activeDistribution={distribution}
-        onDistributionChange={setDistribution}
-      />
-    </div>
+      onDistributionChange={setDistribution}
+      apiConnected={apiConnected}
+    />
   );
 }
 

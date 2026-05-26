@@ -13,4 +13,5 @@ export type DistributionId = (typeof DISTRIBUTIONS)[number]['id'];
 export interface DistributionPageProps {
   activeDistribution: DistributionId | string;
   onDistributionChange: (id: DistributionId) => void;
+  apiConnected?: boolean;
 }

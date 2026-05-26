@@ -5,11 +5,9 @@ class ParametrosBinomial(BaseModel):
     p: float      # probabilidad de éxito
     x: int        # valor a evaluar
 
-class ParametrosPoisson(BaseModel):
-    lam: float    # lambda, tasa de ocurrencia
-    x: int        # valor a evaluar
-
-
+class ParametrosBernoulli(BaseModel):
+    p: float
+    muestra: int
 
 class ParametrosGeometrica(BaseModel):
     p: float            # probabilidad de éxito

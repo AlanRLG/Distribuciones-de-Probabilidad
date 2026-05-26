@@ -1,89 +1,64 @@
-import { useState } from 'react';
-import type { DistributionPageProps } from '../types/distributions';
-import type { DiscreteSimulationResults } from '../types/simulation';
-import { computeSampleStats } from '../utils/statistics';
+import { useCallback, useState } from 'react';
+import { distributionApi } from '../api/client';
 import { useChartExport } from '../hooks/useChartExport';
-import DistributionLayout from './shared/DistributionLayout';
+import { useSimulation } from '../hooks/useSimulation';
+import type { DistributionPageProps } from '../types/distributions';
+import { mapGeometricResponse } from '../utils/apiMappers';
+import ChartLoading from './shared/ChartLoading';
 import ChartSection from './shared/ChartSection';
 import ControlsSection from './shared/ControlsSection';
+import DistributionLayout from './shared/DistributionLayout';
 import ParameterField from './shared/ParameterField';
-import SimulateButton from './shared/SimulateButton';
 import PmfBarChart from './shared/PmfBarChart';
+import SimulateButton from './shared/SimulateButton';
+import SimulationError from './shared/SimulationError';
 import SimulationInsights from './shared/SimulationInsights';
 
-function geometricPmf(k: number, p: number): number {
-  return (1 - p) ** (k - 1) * p;
-}
-
-function simulateGeometric(p: number, sampleSize: number): DiscreteSimulationResults {
-  const clampedP = Math.min(1, Math.max(0.01, p));
-  const samples = Array.from({ length: sampleSize }, () => {
-    let trials = 1;
-    while (Math.random() >= clampedP) {
-      trials++;
-    }
-    return trials;
-  });
-
-  const stats = computeSampleStats(samples);
-  const theoreticalVariance = (1 - clampedP) / clampedP ** 2;
-  const maxK = 10;
-  const frequencies: Record<number, number> = {};
-
-  samples.forEach((value) => {
-    frequencies[value] = (frequencies[value] || 0) + 1;
-  });
-
-  return {
-    ...stats,
-    theoretical_mean: 1 / clampedP,
-    theoretical_variance: theoreticalVariance,
-    theoretical_std: Math.sqrt(theoreticalVariance),
-    pmf: Array.from({ length: maxK }, (_, index) => {
-      const k = index + 1;
-      return {
-        k,
-        simulated: (frequencies[k] || 0) / sampleSize,
-        theoretical: geometricPmf(k, clampedP),
-      };
-    }),
-  };
-}
-
-const initialResults = simulateGeometric(0.5, 1000);
+const EMPTY_STATS = {
+  empirical_mean: 0,
+  theoretical_mean: 0,
+  empirical_variance: 0,
+  theoretical_variance: 0,
+  empirical_std: 0,
+  theoretical_std: 0,
+};
 
 export default function GeometricDistribution({
   activeDistribution,
   onDistributionChange,
+  apiConnected,
 }: DistributionPageProps) {
   const [p, setP] = useState(0.5);
   const [sampleSize, setSampleSize] = useState(1000);
-  const [results, setResults] = useState(initialResults);
+
+  const run = useCallback(async () => {
+    const response = await distributionApi.geometrica(p, Math.max(1, sampleSize));
+    return mapGeometricResponse(response, p);
+  }, [p, sampleSize]);
+
+  const { results, loading, error, execute } = useSimulation({ run });
   const { chartRef, exportToCSV, exportToPNG } = useChartExport(
-    results,
+    results ?? EMPTY_STATS,
     `geometric_p${p}_N${sampleSize}`,
   );
-
-  const handleSimulate = () => {
-    setResults(simulateGeometric(p, Math.max(1, sampleSize)));
-  };
 
   return (
     <DistributionLayout
       activeDistribution={activeDistribution}
       onDistributionChange={onDistributionChange}
+      apiConnected={apiConnected}
     >
       <ChartSection
         title={`Geométrica(p=${p.toFixed(2)})`}
         subtitle={`Frecuencia relativa simulada vs PMF teórica · N = ${sampleSize.toLocaleString('es-MX')}`}
         chartRef={chartRef}
-        onExportCSV={exportToCSV}
+        onExportCSV={results ? exportToCSV : undefined}
         onExportPNG={exportToPNG}
       >
-        <PmfBarChart data={results.pmf} />
+        {loading || !results ? <ChartLoading /> : <PmfBarChart data={results.pmf} />}
       </ChartSection>
 
-      <ControlsSection description="Modela el número de ensayos de Bernoulli independientes necesarios para obtener el primer éxito. La PMF teórica es P(X=k) = (1−p)^(k−1) · p.">
+      <ControlsSection description="Modela el número de ensayos necesarios para el primer éxito. La PMF teórica es P(X=k) = (1−p)^(k−1) · p.">
         <ParameterField
           id="geometric-p"
           label="Probabilidad de éxito (p)"
@@ -103,14 +78,17 @@ export default function GeometricDistribution({
           value={sampleSize}
           onChange={(e) => setSampleSize(Math.max(1, parseInt(e.target.value, 10) || 1))}
         />
-        <SimulateButton onClick={handleSimulate} />
+        <SimulateButton onClick={() => void execute()} loading={loading} />
       </ControlsSection>
 
-      <SimulationInsights
-        results={results}
-        sampleSize={sampleSize}
-        convergenceHint="Al aumentar N, la media empírica converge a 1/p y las barras simuladas se acercan a la PMF teórica. Prueba N = 50,000 para verlo con claridad."
-      />
+      {error && <SimulationError message={error} />}
+      {results && (
+        <SimulationInsights
+          results={results}
+          sampleSize={sampleSize}
+          convergenceHint="Al aumentar N, la media empírica converge a 1/p y las barras simuladas se acercan a la PMF teórica."
+        />
+      )}
     </DistributionLayout>
   );
 }
