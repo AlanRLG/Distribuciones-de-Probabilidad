@@ -19,7 +19,6 @@ export default function DistributionLayout({
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.logo}>
-          <div className={styles.logoIcon}>Σ</div>
           <div className={styles.headerTitle}>
             <h1>Simulador de Distribuciones</h1>
             <p>

@@ -68,8 +68,19 @@ export default function BinomialDistribution({
           max={1}
           step={0.01}
           value={p}
-          onChange={(e) => setP(parseFloat(e.target.value) || 0)}
+          onChange={(e) =>{
+            let value = parseFloat(e.target.value);
+
+            if (isNaN(value)){
+            setP(0); 
+            return;
+
+        }
+        value = Math.max(0, Math.min(1, value));
+        setP(value);
+          }}
         />
+        
         <ParameterField
           id="binomial-n"
           label="Número de ensayos (n)"

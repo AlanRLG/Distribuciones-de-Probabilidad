@@ -31,6 +31,7 @@ export default function UniformDistribution({
   const [a, setA] = useState(1);
   const [b, setB] = useState(5);
   const [sampleSize, setSampleSize] = useState(5000);
+  const isValidRange = b > a;
 
   const run = useCallback(async () => {
     if (a >= b) {
@@ -92,7 +93,9 @@ export default function UniformDistribution({
           value={sampleSize}
           onChange={(e) => setSampleSize(Math.max(100, parseInt(e.target.value, 10) || 1000))}
         />
-        <SimulateButton onClick={() => void execute()} loading={loading} />
+        
+        <SimulateButton onClick={() => void execute()} loading={loading} disabled={!isValidRange}/>
+        {!isValidRange && <p style={{ color: 'red' }}>El límite superior (b) debe ser mayor que el límite inferior (a).</p>}
       </ControlsSection>
 
       {error && <SimulationError message={error} />}
