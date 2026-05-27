@@ -64,7 +64,6 @@ export default function SimulationInsights({
 
         <div className={styles.interpretationItem}>
           <div className={styles.interpretationLabel}>
-            <span className={styles.interpretationIcon}>✦</span>
             Lectura rápida
           </div>
           <p className={styles.interpretationText}>
@@ -75,7 +74,6 @@ export default function SimulationInsights({
 
         <div className={styles.interpretationItem}>
           <div className={styles.interpretationLabel}>
-            <span className={styles.interpretationIcon}>?</span>
             ¿Por qué hay diferencia?
           </div>
           <p className={styles.interpretationText}>
@@ -86,7 +84,6 @@ export default function SimulationInsights({
 
         <div className={styles.interpretationItem}>
           <div className={styles.interpretationLabel}>
-            <span className={styles.interpretationIcon}>↗</span>
             Ley de los Grandes Números
           </div>
           <p className={styles.interpretationText}>{convergenceHint}</p>

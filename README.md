@@ -38,11 +38,19 @@ Distribuciones-de-Probabilidad/
 │
 ├── Frontend/               # React + TypeScript frontend
 │   ├── src/
+│   │   ├── api/            # HTTP client and response types
+│   │   ├── components/     # Distribution components and shared UI
+│   │   ├── hooks/          # Reusable simulation and export logic
+│   │   ├── types/          # TypeScript interfaces
+│   │   └── utils/          # Statistics helpers and export utilities
 │   └── ...
 │
 ├── Backend/                # FastAPI backend (Python)
-│   ├── main.py
-│   └── ...
+│   ├── main.py             # API endpoints
+│   ├── models/
+│   │   └── parametros.py   # Pydantic parameter schemas
+│   └── services/
+│       └── distribuciones.py  # Statistical calculation logic
 │
 ├── .gitignore
 └── README.md
@@ -52,15 +60,15 @@ Distribuciones-de-Probabilidad/
 
 ## 📈 Implemented Distributions
 
-| Distribution | Description |
-|---|---|
-| Bernoulli | Models a single trial with two possible outcomes: success or failure |
-| Binomial | Models the number of successes in a fixed number of independent Bernoulli trials |
-| Poisson | Models the number of events occurring in a fixed interval of time or space |
-| Geometric | Models the number of trials needed to get the first success |
-| Normal | Continuous symmetric distribution defined by its mean and standard deviation |
-| Exponential | Models the time between consecutive events in a Poisson process |
-| Uniform | All outcomes in a given range are equally likely |
+| Distribution | Type | Description |
+|---|---|---|
+| Bernoulli | Discrete | Models a single trial with two possible outcomes: success or failure |
+| Binomial | Discrete | Models the number of successes in a fixed number of independent Bernoulli trials |
+| Geometric | Discrete | Models the number of trials needed to get the first success |
+| Poisson | Discrete | Models the number of events occurring in a fixed interval of time or space |
+| Normal | Continuous | Symmetric bell-shaped distribution defined by mean and standard deviation |
+| Exponential | Continuous | Models the time between consecutive events in a Poisson process |
+| Uniform | Continuous | All outcomes in a given range are equally likely |
 
 ---
 
@@ -69,17 +77,19 @@ Distribuciones-de-Probabilidad/
 ### Frontend
 | Library | Purpose |
 |---|---|
-| [React](https://react.dev/) | UI component framework |
-| [TypeScript](https://www.typescriptlang.org/) | Typed superset of JavaScript |
-| [Axios](https://axios-http.com/) | HTTP client for API requests |
-| [Plotly.js](https://plotly.com/javascript/) | Interactive distribution charts |
+| [React](https://react.dev/) | UI component framework with functional components and hooks |
+| [TypeScript](https://www.typescriptlang.org/) | Static typing over JavaScript |
+| [Recharts](https://recharts.org/) | Interactive charts (BarChart for PMF, LineChart for PDF/CDF) |
+| [html2canvas](https://html2canvas.hertzen.com/) | Export charts as downloadable PNG images |
+| [Vite](https://vitejs.dev/) | Frontend bundler and development server |
 
 ### Backend
 | Library | Purpose |
 |---|---|
-| [FastAPI](https://fastapi.tiangolo.com/) | REST API framework |
-| [NumPy](https://numpy.org/) | Numerical computations and array operations |
-| [SciPy](https://scipy.org/) | Statistical distributions and probability functions |
+| [FastAPI](https://fastapi.tiangolo.com/) | REST API framework with automatic validation |
+| [NumPy](https://numpy.org/) | Random data generation and empirical statistics |
+| [SciPy](https://scipy.org/) | Theoretical PDF curves for continuous distributions |
+| [Pydantic](https://docs.pydantic.dev/) | Parameter validation schemas |
 | [Uvicorn](https://www.uvicorn.org/) | ASGI server to run the FastAPI app |
 
 ---
@@ -94,7 +104,7 @@ Distribuciones-de-Probabilidad/
 - 📐 Probability Density Functions (PDF)
 - 📋 Cumulative Distribution Functions (CDF)
 - 📏 Expected Value and Variance
-- 🧪 Statistical Modeling
+- 🧪 Law of Large Numbers
 
 ---
 
@@ -104,7 +114,7 @@ Make sure you have installed:
 
 | Tool    | Min. Version | Download |
 |---------|-------------|----------|
-| Node.js | 18+         | [nodejs.org](https://nodejs.org/) |
+| Node.js | 20+         | [nodejs.org](https://nodejs.org/) |
 | npm     | 9+          | Included with Node.js |
 | Python  | 3.10+       | [python.org](https://www.python.org/) |
 | pip     | Any         | Included with Python |
@@ -181,60 +191,58 @@ http://localhost:5173
 
 1. Make sure **both servers** (backend and frontend) are running simultaneously.
 2. Open `http://localhost:5173` in your browser.
-3. Select the probability distribution you want to analyze.
+3. Select the probability distribution you want to analyze from the top navigation bar.
 4. Adjust the distribution parameters using the interactive controls.
-5. Observe the generated chart (PMF/PDF and CDF) and the calculated statistical values (mean, variance, etc.).
+5. Click **▶ Simular** to generate random data and compute statistics.
+6. Observe the generated chart (PMF or PDF/CDF) and the comparison table between simulated and theoretical values.
+7. Use the **Exportar CSV** or **Exportar PNG** buttons to save the results.
 
 ---
 
 ## 📊 Features
 
-- Interactive probability calculations
-- Dynamic graphical visualization with Plotly.js
-- Modern responsive UI
-- Real-time parameter updates
-- REST API-based architecture
-- Automatic API documentation (Swagger UI)
+- Interactive probability simulations via REST API
+- Dynamic graphical visualization with Recharts (bar charts for discrete, line charts for continuous)
+- Comparison table: empirical vs. theoretical mean, variance and standard deviation
+- Configurable sample size to observe the Law of Large Numbers
+- Export results as CSV or PNG
+- Parameter validation on both frontend and backend
+- Automatic API documentation (Swagger UI at `/docs`)
 
 ---
 
 ## 🎯 Future Improvements
 
-- [ ] Export graphs as images
-- [ ] Dark / Light mode
-- [ ] Step-by-step calculations
-- [ ] Distribution comparison tools
-- [ ] Statistical simulations
+- [ ] Complete Hypergeometric distribution frontend interface
+- [ ] Add histogram with adjustable bins for continuous distributions
+- [ ] Simultaneous comparison of two distributions
+- [ ] Central Limit Theorem simulation
+- [ ] Goodness-of-fit tests (Chi-square, Kolmogorov-Smirnov)
 - [ ] Confidence intervals
-- [ ] Hypothesis testing
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Authors
 
-**Alan Leaños**
-
-> Computer Systems student at ESCOM – IPN 
+**Alan Rodrigo Leaños Gutiérrez**
+> Computer Systems student at ESCOM – IPN
 
 [![GitHub](https://img.shields.io/badge/GitHub-AlanRLG-181717?style=flat-square&logo=github)](https://github.com/AlanRLG)
 
 **Omar Barron**
-
-> Computer Systems student at ESCOM – IPN 
+> Computer Systems student at ESCOM – IPN
 
 [![GitHub](https://img.shields.io/badge/GitHub-FairerFilly6-181717?style=flat-square&logo=github)](https://github.com/FairerFilly6)
 
 **Christopher Gonzalez**
-
-![Github](https://github.com/sierraGC1)
-
-> Computer Systems student at ESCOM – IPN 
-
-**Salomon Barrero**
-
 > Computer Systems student at ESCOM – IPN
 
-![Github](https://github.com/subparbard251)
+[![GitHub](https://img.shields.io/badge/GitHub-sierraGC1-181717?style=flat-square&logo=github)](https://github.com/sierraGC1)
+
+**Salomon Barrero**
+> Computer Systems student at ESCOM – IPN
+
+[![GitHub](https://img.shields.io/badge/GitHub-subparbard251-181717?style=flat-square&logo=github)](https://github.com/subparbard251)
 
 ---
 
@@ -245,5 +253,5 @@ This repository is for **educational purposes**. Feel free to use it as a refere
 ---
 
 <div align="center">
-  <sub>Made with 💻 and 📊 at ESCOM – IPN · Computer Systems Engineering</sub>
+  <sub>Made   at ESCOM – IPN · Computer Systems Engineering · Group 4CM2</sub>
 </div>
