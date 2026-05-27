@@ -8,7 +8,7 @@ from services.distribuciones import calcularBernoulli, calcularBinomial, calcula
 app = FastAPI()
 
 origins = [
-    "https://distribuciones-de-probabilidad-escom-mkk5lnd15.vercel.app",  # tu URL de Vercel
+    "https://distribuciones-de-probabilidad-escom-52gei2mgh.vercel.app",  # tu URL de Vercel
     "http://localhost:5173",  # para desarrollo local
     "http://localhost:3000"
 ]
